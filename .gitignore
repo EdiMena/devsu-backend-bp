@@ -1,0 +1,21 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+
+## JetBrains Rider
+.idea/
+
+## Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+
+## Visual Studio cache/options
+.vs/
+
+## OS
+.DS_Store
+Thumbs.db
