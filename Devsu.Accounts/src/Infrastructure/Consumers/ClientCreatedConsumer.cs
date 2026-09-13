@@ -21,22 +21,36 @@ public class ClientCreatedConsumer : IConsumer<ClientCreated>
 
 public class ClientUpdatedConsumer : IConsumer<ClientUpdated>
 {
-    private readonly IKnownClientRepository _repository;
-    public ClientUpdatedConsumer(IKnownClientRepository repository) => _repository = repository;
+    private readonly IKnownClientRepository _knownClientRepository;
+    private readonly IAccountRepository _accountRepository;
+
+    public ClientUpdatedConsumer(IKnownClientRepository knownClientRepository,
+        IAccountRepository accountRepository)
+    {
+        _knownClientRepository = knownClientRepository;
+        _accountRepository = accountRepository;
+    }
 
     public async Task Consume(ConsumeContext<ClientUpdated> context)
     {
         var message = context.Message;
-        var existing = await _repository.GetByIdAsync(message.ClientId);
+        var existing = await _knownClientRepository.GetByIdAsync(message.ClientId);
         if (existing is not null)
         {
             existing.UpdateFrom(message.Name, message.IsActive);
-            await _repository.UpdateAsync(existing);
+            await _knownClientRepository.UpdateAsync(existing);
         }
         else
         {
-            await _repository.AddAsync(new KnownClient(message.ClientId, message.Name, message.IsActive));
+            await _knownClientRepository.AddAsync(new KnownClient(message.ClientId, message.Name, message.IsActive));
+        }
+
+        var accounts = await _accountRepository.GetAllByClientIdAsync(message.ClientId);
+        foreach (var account in accounts.Where(a => a.IsActive != message.IsActive))
+        {
+            if (message.IsActive) account.Activate();
+            else account.Deactivate();
+            await _accountRepository.UpdateAsync(account);
         }
     }
 }
-

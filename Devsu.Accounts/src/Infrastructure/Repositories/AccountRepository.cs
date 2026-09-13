@@ -18,7 +18,8 @@ public class AccountRepository : IAccountRepository
         .Include(a => a.Movements.OrderBy(m => m.MovementId))
         .FirstOrDefaultAsync(a => a.AccountNumber == accountNumber);
 
-    public async Task<IReadOnlyList<Account>> GetAllAsync() => await _context.Accounts.ToListAsync();
+    public async Task<IReadOnlyList<Account>> GetAllAsync() => await _context.Accounts
+        .Include(a => a.Movements.OrderByDescending(m => m.MovementId).Take(1)).ToListAsync();
 
     public async Task AddAsync(Account account)
     {
@@ -27,4 +28,8 @@ public class AccountRepository : IAccountRepository
     }
 
     public async Task UpdateAsync(Account account) => await _context.SaveChangesAsync();
+
+    public async Task<IReadOnlyList<Account>> GetAllByClientIdAsync(int clientId) => await _context.Accounts
+        .Where(a => a.ClientId == clientId)
+        .ToListAsync();
 }
