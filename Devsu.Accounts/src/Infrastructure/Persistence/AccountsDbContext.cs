@@ -11,7 +11,7 @@ public class AccountsDbContext : DbContext
 
     public DbSet<Movement> Movements => Set<Movement>();
     public DbSet<Account> Accounts => Set<Account>();
-    public DbSet<KnownClient> KnowClients => Set<KnownClient>();
+    public DbSet<KnownClient> KnownClients => Set<KnownClient>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

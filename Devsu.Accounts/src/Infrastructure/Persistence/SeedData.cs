@@ -1,5 +1,6 @@
 using Domain;
 using Domain.Enums;
+using Contracts;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence;
@@ -9,6 +10,11 @@ public static class SeedData
     public static async Task SeedAsync(AccountsDbContext context)
     {
         if (await context.Accounts.AnyAsync()) return;
+        
+        var joseKnownClient = new KnownClient(1, "Jose Lema", isActive: true);
+        var marianelaKnownClient = new KnownClient(2, "Marianela Montalvo", isActive: true);
+        var juanKnownClient = new KnownClient(3, "Juan Osorio", isActive: true);
+        context.KnownClients.AddRange(joseKnownClient, marianelaKnownClient, juanKnownClient);
 
         var joseAhorros = new Account("478758", AccountType.Ahorros, 2000, clientId: 1, clientName: "Jose Lema");
         var marianelaCorriente = new Account("225487", AccountType.Corriente, 100, clientId: 2, clientName: "Marianela Montalvo");

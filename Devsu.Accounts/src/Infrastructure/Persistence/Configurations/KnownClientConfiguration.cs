@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Persistence.Configurations;
 
-public class KnowClientConfiguration : IEntityTypeConfiguration<KnownClient>
+public class KnownClientConfiguration : IEntityTypeConfiguration<KnownClient>
 {
     public void Configure(EntityTypeBuilder<KnownClient> builder)
     {

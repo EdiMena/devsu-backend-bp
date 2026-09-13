@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
+builder.Services.AddProblemDetails();
 builder.Services.AddDbContext<AccountsDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("AccountsDb")).UseSnakeCaseNamingConvention());
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
