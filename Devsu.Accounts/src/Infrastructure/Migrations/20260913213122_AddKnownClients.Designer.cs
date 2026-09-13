@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AccountsDbContext))]
-    [Migration("20260913212123_AddKnownClients")]
+    [Migration("20260913213122_AddKnownClients")]
     partial class AddKnownClients
     {
         /// <inheritdoc />
