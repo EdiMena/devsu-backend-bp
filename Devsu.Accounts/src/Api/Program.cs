@@ -14,6 +14,7 @@ builder.Services.AddDbContext<AccountsDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("AccountsDb")).UseSnakeCaseNamingConvention());
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IMovementRepository, MovementRepository>();
+builder.Services.ConfigureHttpJsonOptions(options => options.SerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()));
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())

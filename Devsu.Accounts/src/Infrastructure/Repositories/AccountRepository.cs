@@ -15,7 +15,8 @@ public class AccountRepository : IAccountRepository
         .FirstOrDefaultAsync(a => a.AccountNumber == accountNumber);
 
     public async Task<Account?> GetByNumberWithMovementsAsync(string accountNumber) => await _context.Accounts
-        .Include(a => a.Movements).FirstOrDefaultAsync(a => a.AccountNumber == accountNumber);
+        .Include(a => a.Movements.OrderBy(m => m.MovementId))
+        .FirstOrDefaultAsync(a => a.AccountNumber == accountNumber);
 
     public async Task<IReadOnlyList<Account>> GetAllAsync() => await _context.Accounts.ToListAsync();
 

@@ -16,7 +16,7 @@ public class Account
     public IReadOnlyCollection<Movement> Movements => _movements.AsReadOnly();
 
     public decimal AvailableBalance => _movements.Count > 0
-        ? _movements.OrderByDescending(m => m.MovementId).First().Balance
+        ? _movements.Last().Balance
         : InitialBalance;
 
     protected Account()
