@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: devsu-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: devsu_clients
+    ports:
+      - "5432:5432"
+    volumes:
+      - devsu_postgres_data:/var/lib/postgresql/data
+      - ./db-init:/docker-entrypoint-initdb.d
+
+volumes:
+  devsu_postgres_data:
