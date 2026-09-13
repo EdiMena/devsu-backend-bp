@@ -3,8 +3,10 @@ using Application.Contracts;
 using Domain;
 using Domain.Enums;
 using Domain.Exceptions;
+using Infrastructure.Consumers;
 using Infrastructure.Persistence;
 using Infrastructure.Repositories;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,7 +16,26 @@ builder.Services.AddDbContext<AccountsDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("AccountsDb")).UseSnakeCaseNamingConvention());
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IMovementRepository, MovementRepository>();
-builder.Services.ConfigureHttpJsonOptions(options => options.SerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()));
+builder.Services.AddScoped<IKnownClientRepository, KnownClientRepository>();
+
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumer<ClientCreatedConsumer>();
+    x.AddConsumer<ClientUpdatedConsumer>();
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host("localhost", "/", h =>
+        {
+            h.Username(builder.Configuration["RabbitMq:User"] ?? "guest");
+            h.Password(builder.Configuration["RabbitMq:Password"] ?? "guest");
+        });
+
+        cfg.ConfigureEndpoints(context);
+    });
+});
+builder.Services.ConfigureHttpJsonOptions(options =>
+    options.SerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()));
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -24,24 +45,31 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapPost("/accounts", async (CreateAccountRequest request, IAccountRepository repository) =>
-{
-    try
+app.MapPost("/accounts",
+    async (CreateAccountRequest request, IAccountRepository repository, IKnownClientRepository knownClientRepository) =>
     {
-        var account = new Account(request.AccountNumber, request.AccountType, request.InitialBalance, request.ClientId,
-            request.ClientName);
-        await repository.AddAsync(account);
-        return Results.Created($"/accounts/{account.AccountNumber}", ToAccountResponse(account));
-    }
-    catch (DbUpdateException)
-    {
-        return Results.Problem(detail: "Ya existe una cuenta con ese número", statusCode: 409, title: "Conflict");
-    }
-    catch (AppException ex)
-    {
-        return Results.Problem(detail: ex.Message, statusCode: ex.StatusCode, title: ex.GetType().Name);
-    }
-});
+        try
+        {
+            var knownClient = await knownClientRepository.GetByIdAsync(request.ClientId);
+            if (knownClient is null)
+                throw new NotFoundException(
+                    $"Cliente {request.ClientId} no encontrado o todavía no sincronizado desde Clients.");
+
+            var account = new Account(request.AccountNumber, request.AccountType, request.InitialBalance,
+                request.ClientId,
+                request.ClientName);
+            await repository.AddAsync(account);
+            return Results.Created($"/accounts/{account.AccountNumber}", ToAccountResponse(account));
+        }
+        catch (DbUpdateException)
+        {
+            return Results.Problem(detail: "Ya existe una cuenta con ese número", statusCode: 409, title: "Conflict");
+        }
+        catch (AppException ex)
+        {
+            return Results.Problem(detail: ex.Message, statusCode: ex.StatusCode, title: ex.GetType().Name);
+        }
+    });
 
 app.MapGet("/accounts/{accountNumber}", async (string accountNumber, IAccountRepository repository) =>
 {
