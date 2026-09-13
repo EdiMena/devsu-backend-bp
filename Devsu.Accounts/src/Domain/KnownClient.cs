@@ -3,7 +3,7 @@ namespace Domain;
 public class KnownClient
 {
     public int ClientId { get; private set; }
-    public string Name { get; private set; } = null;
+    public string Name { get; private set; } = null!;
     public bool IsActive { get; private set; }
     
     protected KnownClient()
