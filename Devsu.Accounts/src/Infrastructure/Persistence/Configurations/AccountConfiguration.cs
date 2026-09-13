@@ -12,7 +12,7 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
         builder.HasKey(a => a.AccountNumber);
         
         builder.Property(a => a.AccountNumber).HasMaxLength(20);
-        builder.Property(a => a.AccountType).HasMaxLength(20).IsRequired();
+        builder.Property(a => a.AccountType).HasConversion<string>().HasMaxLength(20).IsRequired();
         builder.Property(a => a.InitialBalance).HasPrecision(18,2).IsRequired();
         builder.Ignore(a => a.AvailableBalance);
         builder.Property(a => a.IsActive).IsRequired();

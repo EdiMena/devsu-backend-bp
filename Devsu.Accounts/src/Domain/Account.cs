@@ -6,7 +6,7 @@ namespace Domain;
 public class Account
 {
     public string AccountNumber { get; private set; } = null!;
-    public string AccountType { get; private set; } = null!;
+    public AccountType AccountType { get; private set; }
     public decimal InitialBalance { get; private set; }
     public bool IsActive { get; private set; }
     public int ClientId { get; private set; }
@@ -23,7 +23,7 @@ public class Account
     {
     }
 
-    public Account(string accountNumber, string accountType, decimal initialBalance, int clientId, string clientName)
+    public Account(string accountNumber, AccountType accountType, decimal initialBalance, int clientId, string clientName)
     {
         if (initialBalance < 0) throw new ValidationException("El saldo inicial no puede ser negativo");
 
@@ -77,4 +77,9 @@ public class Account
         if (correctMovementType == MovementType.Deposito) RegisterDeposit(correctAmount);
         else RegisterWithdrawal(correctAmount);
     }
+
+    public void ChangeAccountType(AccountType newAccountType) => AccountType = newAccountType;
+    
+    public void Deactivate() => IsActive = false;
+    public void Activate() => IsActive = true;
 }
