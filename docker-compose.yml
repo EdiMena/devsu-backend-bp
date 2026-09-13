@@ -11,6 +11,16 @@ services:
     volumes:
       - devsu_postgres_data:/var/lib/postgresql/data
       - ./db-init:/docker-entrypoint-initdb.d
+      
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: devsu-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
 
 volumes:
   devsu_postgres_data:
