@@ -7,8 +7,7 @@ public record CreateAccountRequest(
     string AccountNumber,
     AccountType AccountType,
     decimal InitialBalance,
-    int ClientId,
-    string ClientName);
+    int ClientId);
 
 public record UpdateAccountRequest(
     AccountType AccountType);

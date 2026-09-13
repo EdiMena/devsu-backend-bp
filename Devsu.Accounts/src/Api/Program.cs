@@ -56,8 +56,7 @@ app.MapPost("/accounts",
                     $"Cliente {request.ClientId} no encontrado o todavía no sincronizado desde Clients.");
 
             var account = new Account(request.AccountNumber, request.AccountType, request.InitialBalance,
-                request.ClientId,
-                request.ClientName);
+                request.ClientId, knownClient.Name);
             await repository.AddAsync(account);
             return Results.Created($"/accounts/{account.AccountNumber}", ToAccountResponse(account));
         }
