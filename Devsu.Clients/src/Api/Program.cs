@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
+builder.Services.AddProblemDetails();
 builder.Services.AddDbContext<ClientsDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("ClientsDb")).UseSnakeCaseNamingConvention());
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
