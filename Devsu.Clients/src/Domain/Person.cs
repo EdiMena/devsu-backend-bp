@@ -16,17 +16,33 @@ public class Person
     {
     }
 
+    public void UpdateProfile(string name, string gender, int age, string identificationNumber, string address,
+        string phoneNumber)
+    {
+        Validate(name, age, identificationNumber);
+        Name = name;
+        Gender = gender;
+        Age = age;
+        IdentificationNumber = identificationNumber;
+        Address = address;
+        PhoneNumber = phoneNumber;
+    }
+
     protected Person(string name, string gender, int age, string identificationNumber, string address, string phoneNumber)
     {
-        if(string.IsNullOrWhiteSpace(name)) throw new ValidationException("El nombre es obligatorio");
-        if(age<=0) throw new ValidationException("La edad debe ser mayor a cero");
-        if(string.IsNullOrWhiteSpace(identificationNumber)) throw new ValidationException("El número de identificación es obligatorio");
-        
+        Validate(name, age, identificationNumber);
         Name=name;
         Gender=gender;
         Age=age;
         IdentificationNumber=identificationNumber;
         Address=address;
         PhoneNumber=phoneNumber;
+    }
+    
+    private static void Validate(string name, int age, string identificationNumber)
+    {
+        if (string.IsNullOrWhiteSpace(name)) throw new ValidationException("El nombre es obligatorio");
+        if (age <= 0) throw new ValidationException("La edad debe ser mayor a cero");
+        if (string.IsNullOrWhiteSpace(identificationNumber)) throw new ValidationException("El número de identificación es obligatorio");
     }
 }
