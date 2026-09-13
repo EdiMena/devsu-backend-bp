@@ -9,4 +9,5 @@ public interface IClientRepository
     Task AddAsync(Client client);
     Task UpdateAsync(Client client);
     Task DeactivateAsync(int clientId);
+    Task ActivateAsync(int clientId);
 }

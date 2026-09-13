@@ -31,4 +31,13 @@ public class ClientRepository : IClientRepository
         client.Deactivate();
         await _context.SaveChangesAsync();
     }
+
+    public async Task ActivateAsync(int clientId)
+    {
+        var client = await GetByIdAsync(clientId);
+        if (client is null) throw new NotFoundException($"Cliente {clientId} no encontrado");
+        
+        client.Activate();
+        await _context.SaveChangesAsync();
+    }
 }
