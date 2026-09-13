@@ -145,4 +145,10 @@ AccountResponse ToAccountResponse(Account a) => new(a.AccountNumber, a.AccountTy
 MovementResponse ToMovementResponse(Movement m) =>
     new(m.MovementId, m.MovementDate, m.MovementType, m.Amount, m.Balance, m.AccountNumber);
 
+app.MapPost("/seed", async (AccountsDbContext context) =>
+{
+    await SeedData.SeedAsync(context);
+    return Results.Ok("Seed ejecutado.");
+});
+
 app.Run();

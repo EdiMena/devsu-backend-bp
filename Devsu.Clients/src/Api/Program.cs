@@ -93,4 +93,10 @@ ClientResponse ToResponse(Client c) => new(c.PersonId, c.Name, c.Gender, c.Age, 
     c.PhoneNumber, c.IsActive)
 ;
 
+app.MapPost("/seed", async (ClientsDbContext context, IPasswordHasher hasher) =>
+{
+    await SeedData.SeedAsync(context, hasher);
+    return Results.Ok("Seed ejecutado.");
+});
+
 app.Run();

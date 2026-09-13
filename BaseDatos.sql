@@ -60,7 +60,7 @@ COMMIT;
 -- Entidades: Account (raíz del agregado) / Movement (hijo, inmutable).
 -- accounts.client_id/client_name son una referencia LÓGICA
 -- al microservicio de Clients — SIN Foreign Key física, a propósito. 
--- Se sincronizan vía evento asíncrono (RabbitMQ).
+-- Se sincronizan vía evento asíncrono (RabbitMQ se va a intentar).
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS "__EFMigrationsHistory" (
