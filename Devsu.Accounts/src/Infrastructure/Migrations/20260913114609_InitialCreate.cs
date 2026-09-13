@@ -19,7 +19,6 @@ namespace Infrastructure.Migrations
                     account_number = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     account_type = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     initial_balance = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
-                    available_balance = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
                     is_active = table.Column<bool>(type: "boolean", nullable: false),
                     client_id = table.Column<int>(type: "integer", nullable: false),
                     client_name = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false)

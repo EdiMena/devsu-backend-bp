@@ -14,7 +14,7 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
         builder.Property(a => a.AccountNumber).HasMaxLength(20);
         builder.Property(a => a.AccountType).HasMaxLength(20).IsRequired();
         builder.Property(a => a.InitialBalance).HasPrecision(18,2).IsRequired();
-        builder.Property(a => a.AvailableBalance).HasPrecision(18,2).IsRequired();
+        builder.Ignore(a => a.AvailableBalance);
         builder.Property(a => a.IsActive).IsRequired();
         builder.Property(a => a.ClientId).IsRequired();
         builder.Property(a => a.ClientName).HasMaxLength(150).IsRequired();

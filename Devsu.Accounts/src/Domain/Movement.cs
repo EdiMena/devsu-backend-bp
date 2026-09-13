@@ -1,10 +1,13 @@
-﻿namespace Domain;
+﻿using Domain.Enums;
+using Domain.Exceptions;
+
+namespace Domain;
 
 public class Movement
 {
     public int MovementId { get; private set; }
     public DateOnly MovementDate { get; private set; }
-    public string MovementType { get; private set; } = null!;
+    public MovementType MovementType { get; private set; }
     public decimal Amount { get; private set; }
     public decimal Balance { get; private set; }
     public string AccountNumber { get; private set; } = null!;
@@ -13,7 +16,7 @@ public class Movement
     {
     }
 
-    internal Movement(DateOnly movementDate, string movementType, decimal amount, decimal balance, string accountNumber)
+    internal Movement(DateOnly movementDate, MovementType movementType, decimal amount, decimal balance, string accountNumber)
     {
         MovementDate = movementDate;
         MovementType = movementType;
