@@ -89,7 +89,7 @@ app.MapPut("/clients/{id:int}",
             client.UpdateProfile(request.Name, request.Gender, request.Age, request.IdentificationNumber,
                 request.Address,
                 request.PhoneNumber);
-            await publishEndpoint.Publish(new ClientCreated(client.PersonId, client.Name, client.IsActive));
+            await publishEndpoint.Publish(new ClientUpdated(client.PersonId, client.Name, client.IsActive));
             await repository.UpdateAsync(client);
             return Results.Ok(ToResponse(client));
         }
@@ -105,7 +105,7 @@ app.MapDelete("/clients/{id:int}", async (int id, IClientRepository repository, 
     if (client is null) return Results.NotFound();
 
     await repository.DeactivateAsync(id);
-    await publishEndpoint.Publish(new ClientCreated(client.PersonId, client.Name, false));
+    await publishEndpoint.Publish(new ClientUpdated(client.PersonId, client.Name, false));
     return Results.NoContent();
 });
 
@@ -116,7 +116,7 @@ app.MapPut("/clients/{id:int}/activate",
         if (client is null) return Results.NotFound();
 
         await repository.ActivateAsync(id);
-        await publishEndpoint.Publish(new ClientCreated(client.PersonId, client.Name, true));
+        await publishEndpoint.Publish(new ClientUpdated(client.PersonId, client.Name, true));
         return Results.NoContent();
     });
 
