@@ -8,5 +8,5 @@ public interface IClientRepository
     Task<IReadOnlyList<Client>> GetAllAsync();
     Task AddAsync(Client client);
     Task UpdateAsync(Client client);
-    Task DeleteAsync(int clientId);
+    Task DeactivateAsync(int clientId);
 }
