@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AccountsDbContext))]
-    [Migration("20260913114609_InitialCreate")]
+    [Migration("20260913220601_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -61,6 +61,28 @@ namespace Infrastructure.Migrations
                         .HasName("pk_accounts");
 
                     b.ToTable("accounts", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.KnownClient", b =>
+                {
+                    b.Property<int>("ClientId")
+                        .HasColumnType("integer")
+                        .HasColumnName("client_id");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)")
+                        .HasColumnName("name");
+
+                    b.HasKey("ClientId")
+                        .HasName("pk_known_clients");
+
+                    b.ToTable("known_clients", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Movement", b =>
