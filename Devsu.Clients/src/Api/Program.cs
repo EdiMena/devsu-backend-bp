@@ -16,6 +16,8 @@ builder.Services.AddDbContext<ClientsDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("ClientsDb")).UseSnakeCaseNamingConvention());
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
+builder.Services.ConfigureHttpJsonOptions(options =>
+    options.SerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()));
 builder.Services.AddMassTransit(x =>
 {
     x.UsingRabbitMq((context, cfg) =>
@@ -100,21 +102,22 @@ app.MapDelete("/clients/{id:int}", async (int id, IClientRepository repository, 
 {
     var client = await repository.GetByIdAsync(id);
     if (client is null) return Results.NotFound();
-    
+
     await repository.DeactivateAsync(id);
     await publishEndpoint.Publish(new ClientCreated(client.PersonId, client.Name, false));
     return Results.NoContent();
 });
 
-app.MapPut("/clients/{id:int}/activate", async (int id, IClientRepository repository, IPublishEndpoint publishEndpoint) =>
-{
-    var client = await repository.GetByIdAsync(id);
-    if (client is null) return Results.NotFound();
-    
-    await repository.ActivateAsync(id);
-    await publishEndpoint.Publish(new ClientCreated(client.PersonId, client.Name, true));
-    return Results.NoContent();
-});
+app.MapPut("/clients/{id:int}/activate",
+    async (int id, IClientRepository repository, IPublishEndpoint publishEndpoint) =>
+    {
+        var client = await repository.GetByIdAsync(id);
+        if (client is null) return Results.NotFound();
+
+        await repository.ActivateAsync(id);
+        await publishEndpoint.Publish(new ClientCreated(client.PersonId, client.Name, true));
+        return Results.NoContent();
+    });
 
 ClientResponse ToResponse(Client c) => new(c.PersonId, c.Name, c.Gender, c.Age, c.IdentificationNumber, c.Address,
     c.PhoneNumber, c.IsActive)

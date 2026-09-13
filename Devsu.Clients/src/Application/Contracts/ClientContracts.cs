@@ -1,8 +1,10 @@
+using Domain.Enums;
+
 namespace Application.Contracts;
 
 public record CreateClientRequest(
     string Name,
-    string Gender,
+    Gender Gender,
     int Age,
     string IdentificationNumber,
     string Address,
@@ -11,7 +13,7 @@ public record CreateClientRequest(
 
 public record UpdateClientRequest(
     string Name,
-    string Gender,
+    Gender Gender,
     int Age,
     string IdentificationNumber,
     string Address,
@@ -20,7 +22,7 @@ public record UpdateClientRequest(
 public record ClientResponse(
     int ClientId,
     string Name,
-    string Gender,
+    Gender Gender,
     int Age,
     string IdentificationNumber,
     string Address,

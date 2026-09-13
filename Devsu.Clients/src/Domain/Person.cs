@@ -1,3 +1,4 @@
+using Domain.Enums;
 using Domain.Exceptions;
 
 namespace Domain;
@@ -6,7 +7,7 @@ public class Person
 {
     public int PersonId { get; private set; }
     public string Name { get; private set; } = null!;
-    public string Gender { get; private set; } = null!;
+    public Gender Gender { get; private set; }
     public int Age { get; private set; }
     public string IdentificationNumber { get; private set; } = null!;
     public string Address { get; private set; } = null!;
@@ -16,7 +17,7 @@ public class Person
     {
     }
 
-    public void UpdateProfile(string name, string gender, int age, string identificationNumber, string address,
+    public void UpdateProfile(string name, Gender gender, int age, string identificationNumber, string address,
         string phoneNumber)
     {
         Validate(name, age, identificationNumber);
@@ -28,7 +29,7 @@ public class Person
         PhoneNumber = phoneNumber;
     }
 
-    protected Person(string name, string gender, int age, string identificationNumber, string address, string phoneNumber)
+    protected Person(string name, Gender gender, int age, string identificationNumber, string address, string phoneNumber)
     {
         Validate(name, age, identificationNumber);
         Name=name;

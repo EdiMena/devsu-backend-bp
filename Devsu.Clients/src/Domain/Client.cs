@@ -1,4 +1,5 @@
-﻿using Domain.Exceptions;
+﻿using Domain.Enums;
+using Domain.Exceptions;
 
 namespace Domain;
 
@@ -11,7 +12,7 @@ public class Client : Person
     {
     }
 
-    public Client(string name, string gender, int age, string identificationNumber, string address, string phoneNumber,string passwordHash)
+    public Client(string name, Gender gender, int age, string identificationNumber, string address, string phoneNumber,string passwordHash)
         : base(name, gender, age, identificationNumber, address, phoneNumber)
     {
         if(string.IsNullOrWhiteSpace(passwordHash)) throw new ValidationException("La contraseña es obligatoria");

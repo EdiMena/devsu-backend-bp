@@ -12,7 +12,7 @@ public class PersonConfiguration : IEntityTypeConfiguration<Person>
         builder.HasKey(p => p.PersonId);
 
         builder.Property(p => p.Name).HasMaxLength(150).IsRequired();
-        builder.Property(p => p.Gender).HasMaxLength(20).IsRequired();
+        builder.Property(p => p.Gender).HasConversion<string>().HasMaxLength(1).IsRequired();
         builder.Property(p => p.IdentificationNumber).HasMaxLength(20).IsRequired();
         builder.HasIndex(p => p.IdentificationNumber).IsUnique();
         builder.Property(p => p.Address).HasMaxLength(250);
