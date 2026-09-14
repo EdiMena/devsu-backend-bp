@@ -203,3 +203,4 @@ MovementResponse ToMovementResponse(Movement m) =>
 #endregion
 
 app.Run();
+public partial class Program { }
