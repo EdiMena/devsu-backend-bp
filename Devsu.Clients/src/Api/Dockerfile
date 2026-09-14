@@ -7,6 +7,7 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+COPY ["Directory.Build.props", "."]
 COPY ["Devsu.Clients/src/Api/Api.csproj", "Devsu.Clients/src/Api/"]
 COPY ["Devsu.Clients/src/Application/Application.csproj", "Devsu.Clients/src/Application/"]
 COPY ["Devsu.Clients/src/Domain/Domain.csproj", "Devsu.Clients/src/Domain/"]
