@@ -151,3 +151,5 @@ ClientResponse ToResponse(Client c) => new(c.PersonId, c.Name, c.Gender, c.Age, 
 #endregion
 
 app.Run();
+
+public partial class Program();
