@@ -40,6 +40,24 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+#region Gets
+
+app.MapGet("/clients/{id:int}", async (int id, IClientRepository repository) =>
+{
+    var client = await repository.GetByIdAsync(id);
+    return client is null ? Results.NotFound() : Results.Ok(ToResponse(client));
+});
+
+app.MapGet("/clients", async (IClientRepository repository) =>
+{
+    var clients = await repository.GetAllAsync();
+    return Results.Ok(clients.Select(ToResponse));
+});
+
+#endregion
+
+#region Posts
+
 app.MapPost("/clients",
     async (CreateClientRequest request, IClientRepository repository, IPasswordHasher hasher,
         IPublishEndpoint publishEndpoint) =>
@@ -66,17 +84,15 @@ app.MapPost("/clients",
         }
     });
 
-app.MapGet("/clients/{id:int}", async (int id, IClientRepository repository) =>
+app.MapPost("/seed", async (ClientsDbContext context, IPasswordHasher hasher) =>
 {
-    var client = await repository.GetByIdAsync(id);
-    return client is null ? Results.NotFound() : Results.Ok(ToResponse(client));
+    await SeedData.SeedAsync(context, hasher);
+    return Results.Ok("Seed ejecutado.");
 });
 
-app.MapGet("/clients", async (IClientRepository repository) =>
-{
-    var clients = await repository.GetAllAsync();
-    return Results.Ok(clients.Select(ToResponse));
-});
+#endregion
+
+#region Puts
 
 app.MapPut("/clients/{id:int}",
     async (int id, UpdateClientRequest request, IClientRepository repository, IPublishEndpoint publishEndpoint) =>
@@ -99,16 +115,6 @@ app.MapPut("/clients/{id:int}",
         }
     });
 
-app.MapDelete("/clients/{id:int}", async (int id, IClientRepository repository, IPublishEndpoint publishEndpoint) =>
-{
-    var client = await repository.GetByIdAsync(id);
-    if (client is null) return Results.NotFound();
-
-    await repository.DeactivateAsync(id);
-    await publishEndpoint.Publish(new ClientUpdated(client.PersonId, client.Name, false));
-    return Results.NoContent();
-});
-
 app.MapPut("/clients/{id:int}/activate",
     async (int id, IClientRepository repository, IPublishEndpoint publishEndpoint) =>
     {
@@ -120,14 +126,28 @@ app.MapPut("/clients/{id:int}/activate",
         return Results.NoContent();
     });
 
+#endregion
+
+#region Deletes
+
+app.MapDelete("/clients/{id:int}", async (int id, IClientRepository repository, IPublishEndpoint publishEndpoint) =>
+{
+    var client = await repository.GetByIdAsync(id);
+    if (client is null) return Results.NotFound();
+
+    await repository.DeactivateAsync(id);
+    await publishEndpoint.Publish(new ClientUpdated(client.PersonId, client.Name, false));
+    return Results.NoContent();
+});
+
+#endregion
+
+#region Mappers
+
 ClientResponse ToResponse(Client c) => new(c.PersonId, c.Name, c.Gender, c.Age, c.IdentificationNumber, c.Address,
     c.PhoneNumber, c.IsActive)
 ;
 
-app.MapPost("/seed", async (ClientsDbContext context, IPasswordHasher hasher) =>
-{
-    await SeedData.SeedAsync(context, hasher);
-    return Results.Ok("Seed ejecutado.");
-});
+#endregion
 
 app.Run();
