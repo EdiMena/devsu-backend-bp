@@ -9,17 +9,17 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Tests.IntegrationTests;
 
-public class ClientsApiTests : IClassFixture<ClientsApifactory>
+public class ClientsApiTests : IClassFixture<ClientsApiFactory>
 {
     private static readonly JsonSerializerOptions JsonOptions = new ()
     {
         PropertyNameCaseInsensitive = true,
         Converters = { new JsonStringEnumConverter() }
     };
-    private readonly ClientsApifactory _factory;
+    private readonly ClientsApiFactory _factory;
     private readonly HttpClient _client;
 
-    public ClientsApiTests(ClientsApifactory factory)
+    public ClientsApiTests(ClientsApiFactory factory)
     {
         _factory = factory;
         _client = factory.CreateClient();
