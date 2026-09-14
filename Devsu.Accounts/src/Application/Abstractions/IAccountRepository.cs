@@ -1,3 +1,4 @@
+using Application.Contracts;
 using Domain;
 
 namespace Application.Abstractions;
@@ -10,4 +11,5 @@ public interface IAccountRepository
     Task<IReadOnlyList<Account>> GetAllByClientIdAsync(int clientId);
     Task AddAsync(Account account);
     Task UpdateAsync(Account account);
+    Task<IReadOnlyList<AccountStatementItem>> GetStatementAsync(int clientId, DateOnly startDate, DateOnly endDate);
 }

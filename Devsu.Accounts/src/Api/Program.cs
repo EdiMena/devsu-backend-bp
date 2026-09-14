@@ -46,6 +46,42 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+#region Gets
+
+app.MapGet("/accounts/{accountNumber}", async (string accountNumber, IAccountRepository repository) =>
+{
+    var account = await repository.GetByNumberAsync(accountNumber);
+    return account is null ? Results.NotFound() : Results.Ok(ToAccountResponse(account));
+});
+
+app.MapGet("/accounts", async (IAccountRepository repository) =>
+{
+    var accounts = await repository.GetAllAsync();
+    return Results.Ok(accounts.Select(ToAccountResponse));
+});
+
+app.MapGet("/movements/{movementId:int}", async (int movementId, IMovementRepository repository) =>
+{
+    var movement = await repository.GetByIdAsync(movementId);
+    return movement is null ? Results.NotFound() : Results.Ok(ToMovementResponse(movement));
+});
+
+app.MapGet("/accounts/{accountNumber}/movements", async (string accountNumber, IMovementRepository repository) =>
+{
+    var movements = await repository.GetByAccountAsync(accountNumber);
+    return Results.Ok(movements.Select(ToMovementResponse));
+});
+
+app.MapGet("/reports", async (int clientId, DateOnly startDate, DateOnly endDate, IAccountRepository repository) =>
+{   
+    var report = await repository.GetStatementAsync(clientId, startDate, endDate);
+    return Results.Ok(report);
+});
+
+#endregion
+
+#region Posts
+
 app.MapPost("/accounts",
     async (CreateAccountRequest request, IAccountRepository repository, IKnownClientRepository knownClientRepository) =>
     {
@@ -71,17 +107,36 @@ app.MapPost("/accounts",
         }
     });
 
-app.MapGet("/accounts/{accountNumber}", async (string accountNumber, IAccountRepository repository) =>
+app.MapPost("/accounts/{accountNumber}/movements",
+    async (string accountNumber, RegisterMovementRequest request, IAccountRepository repository) =>
+    {
+        try
+        {
+            var account = await repository.GetByNumberAsync(accountNumber);
+            if (account is null) return Results.NotFound();
+
+            var movement = request.MovementType == MovementType.Deposito
+                ? account.RegisterDeposit(request.Amount)
+                : account.RegisterWithdrawal(request.Amount);
+
+            await repository.UpdateAsync(account);
+            return Results.Created($"/movements/{movement.MovementId}", ToMovementResponse(movement));
+        }
+        catch (AppException ex)
+        {
+            return Results.Problem(detail: ex.Message, statusCode: ex.StatusCode, title: ex.GetType().Name);
+        }
+    });
+
+app.MapPost("/seed", async (AccountsDbContext context) =>
 {
-    var account = await repository.GetByNumberAsync(accountNumber);
-    return account is null ? Results.NotFound() : Results.Ok(ToAccountResponse(account));
+    await SeedData.SeedAsync(context);
+    return Results.Ok("Seed ejecutado.");
 });
 
-app.MapGet("/accounts", async (IAccountRepository repository) =>
-{
-    var accounts = await repository.GetAllAsync();
-    return Results.Ok(accounts.Select(ToAccountResponse));
-});
+#endregion
+
+#region Puts
 
 app.MapPut("/accounts/{accountNumber}",
     async (string accountNumber, UpdateAccountRequest request, IAccountRepository repository) =>
@@ -112,38 +167,6 @@ app.MapPut("/accounts/{accountNumber}/activate", async (string accountNumber, IA
     return Results.NoContent();
 });
 
-app.MapPost("/accounts/{accountNumber}/movements",
-    async (string accountNumber, RegisterMovementRequest request, IAccountRepository repository) =>
-    {
-        try
-        {
-            var account = await repository.GetByNumberAsync(accountNumber);
-            if (account is null) return Results.NotFound();
-
-            var movement = request.MovementType == MovementType.Deposito
-                ? account.RegisterDeposit(request.Amount)
-                : account.RegisterWithdrawal(request.Amount);
-
-            await repository.UpdateAsync(account);
-            return Results.Created($"/movements/{movement.MovementId}", ToMovementResponse(movement));
-        }
-        catch (AppException ex)
-        {
-            return Results.Problem(detail: ex.Message, statusCode: ex.StatusCode, title: ex.GetType().Name);
-        }
-    });
-
-app.MapGet("/movements/{movementId:int}", async (int movementId, IMovementRepository repository) =>
-{
-    var movement = await repository.GetByIdAsync(movementId);
-    return movement is null ? Results.NotFound() : Results.Ok(ToMovementResponse(movement));
-});
-
-app.MapGet("/accounts/{accountNumber}/movements", async (string accountNumber, IMovementRepository repository) =>
-{
-    var movements = await repository.GetByAccountAsync(accountNumber);
-    return Results.Ok(movements.Select(ToMovementResponse));
-});
 
 app.MapPut("/movements/{movementId:int}", async (int movementId, CorrectMovementRequest request,
     IMovementRepository movementRepository, IAccountRepository accountRepository) =>
@@ -166,6 +189,10 @@ app.MapPut("/movements/{movementId:int}", async (int movementId, CorrectMovement
     }
 });
 
+#endregion
+
+#region Mappers
+
 AccountResponse ToAccountResponse(Account a) => new(a.AccountNumber, a.AccountType, a.InitialBalance,
     a.AvailableBalance,
     a.IsActive, a.ClientId, a.ClientName);
@@ -173,10 +200,6 @@ AccountResponse ToAccountResponse(Account a) => new(a.AccountNumber, a.AccountTy
 MovementResponse ToMovementResponse(Movement m) =>
     new(m.MovementId, m.MovementDate, m.MovementType, m.Amount, m.Balance, m.AccountNumber);
 
-app.MapPost("/seed", async (AccountsDbContext context) =>
-{
-    await SeedData.SeedAsync(context);
-    return Results.Ok("Seed ejecutado.");
-});
+#endregion
 
 app.Run();

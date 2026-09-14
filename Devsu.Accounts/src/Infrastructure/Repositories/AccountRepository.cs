@@ -1,4 +1,5 @@
 using Application.Abstractions;
+using Application.Contracts;
 using Domain;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -32,4 +33,21 @@ public class AccountRepository : IAccountRepository
     public async Task<IReadOnlyList<Account>> GetAllByClientIdAsync(int clientId) => await _context.Accounts
         .Where(a => a.ClientId == clientId)
         .ToListAsync();
+
+    public async Task<IReadOnlyList<AccountStatementItem>> GetStatementAsync(int clientId, DateOnly startDate,
+        DateOnly endDate) =>
+        await (from a in _context.Accounts
+            where a.ClientId == clientId
+            from m in a.Movements
+            where m.MovementDate >= startDate && m.MovementDate <= endDate
+            orderby m.MovementDate
+            select new AccountStatementItem(
+                m.MovementDate,
+                a.ClientName,
+                a.AccountNumber,
+                a.AccountType,
+                a.InitialBalance,
+                a.IsActive,
+                m.Amount,
+                m.Balance)).ToListAsync();
 }
