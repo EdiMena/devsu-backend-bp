@@ -1,4 +1,38 @@
 services:
+  clients-api:
+    build:
+      context: .
+      dockerfile: Devsu.Clients/src/Api/Dockerfile
+    container_name: devsu-clients-api
+    environment:
+      ConnectionStrings__ClientsDb: ${CLIENTS_DB_CONNECTION}
+      RabbitMq__Host: rabbitmq
+      RabbitMq__User: ${RABBITMQ_USER}
+      RabbitMq__Password: ${RABBITMQ_PASSWORD}
+      ASPNETCORE_ENVIRONMENT: Development
+    ports:
+      - "5047:8080"
+    depends_on:
+      - postgres
+      - rabbitmq
+      
+  accounts-api:
+    build:
+      context: .
+      dockerfile: Devsu.Accounts/src/Api/Dockerfile
+    container_name: devsu-accounts-api
+    environment:
+      ConnectionStrings__AccountsDb: ${ACCOUNTS_DB_CONNECTION}
+      RabbitMq__Host: rabbitmq
+      RabbitMq__User: ${RABBITMQ_USER}
+      RabbitMq__Password: ${RABBITMQ_PASSWORD}
+      ASPNETCORE_ENVIRONMENT: Development
+    ports:
+      - "5004:8080"
+    depends_on:
+      - postgres
+      - rabbitmq
+
   postgres:
     image: postgres:17
     container_name: devsu-postgres
